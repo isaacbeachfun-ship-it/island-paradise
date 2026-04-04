@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Island Paradise — 100 Scotch Bonnet Lane</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f8f9fa; color: #1a1a2e; }
+
+  /* Hero */
+  .hero {
+    position: relative; height: 480px; overflow: hidden;
+    background: url('https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556850.jpeg') center/cover;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.7));
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 40px;
+  }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: #fff; }
+  .hero-sub { font-size: 18px; color: rgba(255,255,255,0.85); margin-top: 8px; }
+  .hero-badge {
+    position: absolute; top: 24px; right: 24px;
+    background: rgba(255,255,255,0.95); border-radius: 12px; padding: 12px 20px;
+    font-weight: 700; font-size: 14px; color: #1a1a2e; backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .hero-badge .stars { color: #f4a900; font-size: 16px; }
+
+  /* Stats ribbon */
+  .stats-ribbon {
+    display: flex; gap: 0; background: #1a3a5c; color: #fff;
+    justify-content: center; flex-wrap: wrap;
+  }
+  .stat-item {
+    padding: 18px 32px; text-align: center; border-right: 1px solid rgba(255,255,255,0.15);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-size: 28px; font-weight: 800; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; margin-top: 2px; }
+
+  /* Content container */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Section */
+  .section { margin: 40px 0; }
+  .section-title {
+    font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 20px;
+    padding-bottom: 10px; border-bottom: 3px solid #1a3a5c;
+  }
+
+  /* Booking Chart */
+  .booking-chart { width: 100%; border-collapse: separate; border-spacing: 4px; }
+  .booking-chart th {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666;
+    padding: 8px 4px; text-align: center;
+  }
+  .booking-chart td {
+    text-align: center; padding: 14px 6px; border-radius: 8px; font-weight: 600;
+    font-size: 13px; position: relative; transition: transform 0.15s;
+  }
+  .booking-chart td:hover { transform: scale(1.05); z-index: 2; }
+  .week-available {
+    background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b;
+    border: 2px solid #f87171;
+  }
+  .week-booked {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46;
+    border: 2px solid #34d399;
+  }
+  .week-unknown {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #6b7280;
+    border: 2px solid #d1d5db;
+  }
+  .week-label { font-size: 10px; display: block; margin-top: 2px; opacity: 0.8; }
+  .week-price { font-size: 15px; font-weight: 800; }
+
+  /* Legend */
+  .legend { display: flex; gap: 24px; margin: 16px 0; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .legend-dot { width: 16px; height: 16px; border-radius: 4px; }
+  .legend-dot.red { background: #fecaca; border: 2px solid #f87171; }
+  .legend-dot.green { background: #a7f3d0; border: 2px solid #34d399; }
+  .legend-dot.gray { background: #e5e7eb; border: 2px solid #d1d5db; }
+
+  /* Revenue summary */
+  .revenue-box {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;
+    margin: 24px 0;
+  }
+  .rev-card {
+    background: #fff; border-radius: 12px; padding: 20px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .rev-card .big { font-size: 32px; font-weight: 800; color: #1a3a5c; }
+  .rev-card .lbl { font-size: 12px; color: #666; margin-top: 4px; }
+
+  /* Eval Report Card */
+  .report-card {
+    background: #fff; border-radius: 16px; padding: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .scores-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px; margin: 24px 0;
+  }
+  .score-tile {
+    text-align: center; padding: 20px 12px; border-radius: 12px;
+    background: #f8f9fa;
+  }
+  .score-tile .score-val { font-size: 36px; font-weight: 800; }
+  .score-tile .score-bar {
+    height: 6px; border-radius: 3px; background: #e5e7eb; margin: 8px auto 4px;
+    width: 80%; position: relative; overflow: hidden;
+  }
+  .score-tile .score-fill {
+    position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .score-tile .score-name { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+  .s5 .score-val { color: #059669; } .s5 .score-fill { background: #059669; width: 100%; }
+  .s4 .score-val { color: #0284c7; } .s4 .score-fill { background: #0284c7; width: 80%; }
+  .s3 .score-val { color: #d97706; } .s3 .score-fill { background: #d97706; width: 60%; }
+  .s2 .score-val { color: #dc2626; } .s2 .score-fill { background: #dc2626; width: 40%; }
+  .s1 .score-val { color: #991b1b; } .s1 .score-fill { background: #991b1b; width: 20%; }
+
+  /* Narrative */
+  .narrative {
+    font-size: 17px; line-height: 1.7; color: #374151; margin: 20px 0;
+    padding: 24px; background: #f0f7ff; border-radius: 12px; border-left: 4px solid #1a3a5c;
+  }
+
+  /* Feature pills */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .pill {
+    background: #e0f2fe; color: #0369a1; padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 500;
+  }
+  .pill.amenity { background: #fef3c7; color: #92400e; }
+  .pill.red-flag { background: #fee2e2; color: #991b1b; }
+
+  /* Details grid */
+  .details-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0;
+  }
+  .detail-item { padding: 12px 16px; background: #f8f9fa; border-radius: 8px; }
+  .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #999; }
+  .detail-value { font-size: 15px; font-weight: 600; margin-top: 2px; }
+
+  /* Photo gallery */
+  .gallery-section { margin: 16px 0; }
+  .gallery-room-title {
+    font-size: 14px; font-weight: 700; color: #1a3a5c; margin: 16px 0 8px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .gallery-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .gallery-img {
+    width: 180px; height: 130px; object-fit: cover; border-radius: 8px;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .gallery-img:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+
+  /* Bed details */
+  .bed-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0; }
+  .bed-card {
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .bed-icon { font-size: 28px; }
+  .bed-info .bed-name { font-weight: 700; font-size: 14px; }
+  .bed-info .bed-type { font-size: 12px; color: #666; }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 32px; color: #999; font-size: 12px; margin-top: 40px;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    z-index: 1000; justify-content: center; align-items: center; cursor: pointer;
+  }
+  .lightbox.active { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
+</style>
+</head>
+<body>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')">
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-overlay">
+    <div class="hero-title">Island Paradise</div>
+    <div class="hero-sub">100 Scotch Bonnet Lane &bull; North Topsail Beach, NC</div>
+  </div>
+  <div class="hero-badge">
+    <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+    <div>4.5 / 5 &bull; 13 Reviews</div>
+  </div>
+</div>
+
+<!-- Stats Ribbon -->
+<div class="stats-ribbon">
+  <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Bedrooms</div></div>
+  <div class="stat-item"><div class="stat-num">9</div><div class="stat-label">Bathrooms</div></div>
+  <div class="stat-item"><div class="stat-num">22</div><div class="stat-label">Sleeps</div></div>
+  <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">Floors</div></div>
+  <div class="stat-item"><div class="stat-num">Oceanfront</div><div class="stat-label">Location</div></div>
+  <div class="stat-item"><div class="stat-num">CCR</div><div class="stat-label">Manager</div></div>
+</div>
+
+<div class="container">
+
+  <!-- Booking Chart -->
+  <div class="section">
+    <div class="section-title">2026 Booking Calendar &mdash; May through September</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot red"></div> Available (advertised rate)</div>
+      <div class="legend-item"><div class="legend-dot green"></div> Booked (confirmed from pace data)</div>
+      <div class="legend-item"><div class="legend-dot gray"></div> Unknown / blocked</div>
+    </div>
+
+    <table class="booking-chart">
+      <tr>
+        <th colspan="5" style="font-size:14px; color:#1a3a5c; font-weight:700;">MAY</th>
+        <th colspan="5" style="font-size:14px; color:#1a3a5c; font-weight:700;">JUNE</th>
+        <th colspan="4" style="font-size:14px; color:#1a3a5c; font-weight:700;">JULY</th>
+        <th colspan="5" style="font-size:14px; color:#1a3a5c; font-weight:700;">AUGUST</th>
+        <th colspan="4" style="font-size:14px; color:#1a3a5c; font-weight:700;">SEPTEMBER</th>
+      </tr>
+      <tr>
+        <!-- MAY -->
+        <td class="week-available">
+          <div class="week-price">$6,470</div>
+          <span class="week-label">Apr 25 - May 2</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$6,470</div>
+          <span class="week-label">May 2 - 9</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$7,163</div>
+          <span class="week-label">May 9 - 16</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">May 16 - 23</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">May 23 - 30</span>
+        </td>
+
+        <!-- JUNE -->
+        <td class="week-booked">
+          <div class="week-price">$10,802</div>
+          <span class="week-label">May 30 - Jun 6</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Jun 6 - 13</span>
+        </td>
+        <td class="week-booked">
+          <div class="week-price">$16,335</div>
+          <span class="week-label">Jun 13 - 20</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Jun 20 - 27</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$15,211</div>
+          <span class="week-label">Jun 27 - Jul 4</span>
+        </td>
+
+        <!-- JULY -->
+        <td class="week-booked">
+          <div class="week-price">$16,680</div>
+          <span class="week-label">Jul 4 - 11</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$16,680</div>
+          <span class="week-label">Jul 11 - 18</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Jul 18 - 25</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Jul 25 - Aug 1</span>
+        </td>
+
+        <!-- AUGUST -->
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Aug 1 - 8</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Aug 8 - 15</span>
+        </td>
+        <td class="week-booked">
+          <div class="week-price">$9,222</div>
+          <span class="week-label">Aug 15 - 22</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$9,138</div>
+          <span class="week-label">Aug 22 - 29</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Aug 29 - Sep 5</span>
+        </td>
+
+        <!-- SEPTEMBER -->
+        <td class="week-available">
+          <div class="week-price">$8,054</div>
+          <span class="week-label">Sep 5 - 12</span>
+        </td>
+        <td class="week-unknown">
+          <div class="week-price">?</div>
+          <span class="week-label">Sep 12 - 19</span>
+        </td>
+        <td class="week-booked">
+          <div class="week-price">$6,501</div>
+          <span class="week-label">Sep 19 - 26</span>
+        </td>
+        <td class="week-available">
+          <div class="week-price">$6,598</div>
+          <span class="week-label">Sep 26 - Oct 3</span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Revenue Summary -->
+    <div class="revenue-box">
+      <div class="rev-card">
+        <div class="big" style="color:#059669;">5</div>
+        <div class="lbl">Weeks Booked (confirmed)</div>
+      </div>
+      <div class="rev-card">
+        <div class="big" style="color:#dc2626;">8</div>
+        <div class="lbl">Weeks Available (on shelf)</div>
+      </div>
+      <div class="rev-card">
+        <div class="big" style="color:#6b7280;">10</div>
+        <div class="lbl">Weeks Unknown</div>
+      </div>
+      <div class="rev-card">
+        <div class="big">$60,240</div>
+        <div class="lbl">Confirmed Booked Revenue</div>
+      </div>
+      <div class="rev-card">
+        <div class="big">$75,783</div>
+        <div class="lbl">Available Shelf Value</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gemini Report Card -->
+  <div class="section">
+    <div class="section-title">AI Property Evaluation</div>
+
+    <div class="report-card">
+      <div class="narrative">
+        &ldquo;This Topsail Island property is a <strong>top-tier vacation rental</strong>, offering direct oceanfront access with a private gazebo, a pool, and a hot tub. The interior features a well-maintained, coastal-chic decor with quality furnishings, a game room, and an elevator. While not a brand-new build, the home presents as an <strong>exceptionally solid and amenity-rich option</strong>, noticeably above average for the Topsail market.&rdquo;
+      </div>
+
+      <div class="scores-grid">
+        <div class="score-tile s5">
+          <div class="score-val">5</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">View</div>
+        </div>
+        <div class="score-tile s5">
+          <div class="score-val">5</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Outdoor Living</div>
+        </div>
+        <div class="score-tile s5">
+          <div class="score-val">5</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Photo Quality</div>
+        </div>
+        <div class="score-tile s4">
+          <div class="score-val">4</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Condition</div>
+        </div>
+        <div class="score-tile s4">
+          <div class="score-val">4</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Furniture</div>
+        </div>
+        <div class="score-tile s4">
+          <div class="score-val">4</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Kitchen</div>
+        </div>
+        <div class="score-tile s4">
+          <div class="score-val">4</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Bathrooms</div>
+        </div>
+        <div class="score-tile s4">
+          <div class="score-val">4</div>
+          <div class="score-bar"><div class="score-fill"></div></div>
+          <div class="score-name">Curb Appeal</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:28px; color:#1a3a5c;">Standout Features</h3>
+      <div class="pills">
+        <div class="pill">Direct oceanfront with private gazebo</div>
+        <div class="pill">Private pool + hot tub</div>
+        <div class="pill">In-house elevator</div>
+        <div class="pill">Game room (pool table + air hockey)</div>
+        <div class="pill">Six king beds</div>
+        <div class="pill">Multi-level ocean view decks</div>
+        <div class="pill">Double wall oven kitchen</div>
+      </div>
+
+      <h3 style="margin-top:24px; color:#1a3a5c;">Red Flags</h3>
+      <p style="color:#059669; font-weight:600; margin-top:8px;">None detected</p>
+
+      <div class="details-grid" style="margin-top:28px;">
+        <div class="detail-item">
+          <div class="detail-label">Bedrooms Observed</div>
+          <div class="detail-value">7 (6 adult + 1 bunk room)</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Living Areas</div>
+          <div class="detail-value">2</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Dining Seats</div>
+          <div class="detail-value">12 at table, 16 total</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Decor Style</div>
+          <div class="detail-value">Coastal Chic</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Renovation</div>
+          <div class="detail-value">5-10 years ago</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Washer/Dryer</div>
+          <div class="detail-value">Full-size</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Parking</div>
+          <div class="detail-value">Ample paved + gravel (under house)</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Ground Level</div>
+          <div class="detail-value">Open — parking + pool area</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:24px; color:#1a3a5c;">Amenities Detected</h3>
+      <div class="pills">
+        <div class="pill amenity">Private Pool</div>
+        <div class="pill amenity">Hot Tub</div>
+        <div class="pill amenity">Elevator</div>
+        <div class="pill amenity">Game Room</div>
+        <div class="pill amenity">Pool Table</div>
+        <div class="pill amenity">Air Hockey</div>
+        <div class="pill amenity">Private Beach Access</div>
+        <div class="pill amenity">Beachfront Gazebo</div>
+        <div class="pill amenity">Ocean Views</div>
+        <div class="pill amenity">Multiple Balconies</div>
+        <div class="pill amenity">Fireplace</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bedroom Breakdown -->
+  <div class="section">
+    <div class="section-title">Bedroom Breakdown</div>
+    <div class="bed-cards">
+      <div class="bed-card"><div class="bed-icon">&#128081;</div><div class="bed-info"><div class="bed-name">Master Suite</div><div class="bed-type">King bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128719;&#65039;</div><div class="bed-info"><div class="bed-name">Bunk Room</div><div class="bed-type">2x twin-over-full bunks</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 3</div><div class="bed-type">King bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 4</div><div class="bed-type">King bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 5</div><div class="bed-type">King bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 6</div><div class="bed-type">King bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 7</div><div class="bed-type">King bed</div></div></div>
+    </div>
+  </div>
+
+  <!-- Outdoor Living -->
+  <div class="section">
+    <div class="section-title">Outdoor Living</div>
+    <div class="narrative" style="border-left-color:#059669;">
+      Multi-level decks and balconies with expansive ocean views. Private kidney-shaped pool with ample concrete patio. Hot tub on a covered deck. Private beachfront gazebo with direct stairs to the beach.
+    </div>
+  </div>
+
+  <!-- Interior Details -->
+  <div class="section">
+    <div class="section-title">Interior Quality</div>
+    <div class="narrative" style="border-left-color:#0284c7;">
+      Main living areas feature wood-look tile flooring, vaulted ceilings, and a wall of ocean-facing windows. The kitchen boasts dark granite countertops, solid wood cabinetry, stainless steel appliances including a double wall oven, and a tiled backsplash. The master bathroom is spacious with double pedestal sinks, a large soaking tub, and a separate tiled walk-in shower.
+    </div>
+  </div>
+
+  <!-- Photo Gallery -->
+  <div class="section">
+    <div class="section-title">Photo Gallery (40 images, AI-labeled)</div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Aerial / Drone</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556850.jpeg" onclick="openLightbox(this)" alt="Aerial">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556866.jpeg" onclick="openLightbox(this)" alt="Aerial">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Pool &amp; Hot Tub</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_169828921.jpeg" onclick="openLightbox(this)" alt="Pool">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_169829197.jpeg" onclick="openLightbox(this)" alt="Pool">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556859.jpeg" onclick="openLightbox(this)" alt="Hot Tub">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Game Room</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556906.jpeg" onclick="openLightbox(this)" alt="Game Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_169828959.jpeg" onclick="openLightbox(this)" alt="Game Room">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Living &amp; Dining</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556871.jpeg" onclick="openLightbox(this)" alt="Living Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556872.jpeg" onclick="openLightbox(this)" alt="Living Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556873.jpeg" onclick="openLightbox(this)" alt="Dining Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556874.jpeg" onclick="openLightbox(this)" alt="Dining Room">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Kitchen</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556875.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556876.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556877.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556880.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Master Suite &amp; Bath</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556881.jpeg" onclick="openLightbox(this)" alt="Master Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556882.jpeg" onclick="openLightbox(this)" alt="Master Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556902.jpeg" onclick="openLightbox(this)" alt="Master Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556883.jpeg" onclick="openLightbox(this)" alt="Master Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556884.jpeg" onclick="openLightbox(this)" alt="Master Bathroom">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Bedrooms</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556885.jpeg" onclick="openLightbox(this)" alt="Bunk Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556886.jpeg" onclick="openLightbox(this)" alt="Bunk Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556888.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556889.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556891.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556892.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556894.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556896.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556898.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556900.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556901.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Bathrooms</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556878.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556887.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556890.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556893.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556895.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556897.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/0F/5E/image_171556903.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Topsail Pricing &bull; Property Report generated April 4, 2026 &bull; Data from CCR scrapes + Gemini 2.5 Flash evaluation
+</div>
+
+<script>
+  // Lightbox
+  function openLightbox(img) {
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox').classList.add('active');
+  }
+
+  // Beforeunload protection
+  window.addEventListener('beforeunload', function(e) {
+    e.preventDefault();
+    e.returnValue = '';
+  });
+</script>
+</body>
+</html>
