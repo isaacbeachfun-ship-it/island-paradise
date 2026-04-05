@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hatteras Star — AI Property Evaluation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f8f9fa; color: #1a1a2e; -webkit-text-size-adjust: 100%; }
+
+  .hero { position: relative; height: 280px; overflow: hidden; background: url('https://gallery.streamlinevrs.com/stl-default-images/2128/home/402187/1714395598_image.jpeg') center/cover; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 30%, rgba(0,0,0,0.75)); display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: 28px; color: #fff; line-height: 1.1; }
+  .hero-sub { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+
+  .stats-ribbon { display: grid; grid-template-columns: repeat(3, 1fr); background: #1a3a5c; color: #fff; }
+  .stat-item { padding: 12px 8px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .stat-item:nth-child(3n+2) { border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1); }
+  .stat-num { font-size: 20px; font-weight: 800; }
+  .stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.7; margin-top: 1px; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .section { margin: 28px 0; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 3px solid #1a3a5c; }
+
+  .report-card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .narrative { font-size: 15px; line-height: 1.7; color: #374151; margin: 16px 0; padding: 16px; background: #f0f7ff; border-radius: 12px; border-left: 4px solid #1a3a5c; }
+
+  .scores-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
+  .score-tile { text-align: center; padding: 14px 8px; border-radius: 12px; background: #f8f9fa; }
+  .score-tile .score-val { font-size: 28px; font-weight: 800; }
+  .score-tile .score-bar { height: 5px; border-radius: 3px; background: #e5e7eb; margin: 6px auto 3px; width: 80%; position: relative; overflow: hidden; }
+  .score-tile .score-fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 3px; }
+  .score-tile .score-name { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+  .s5 .score-val { color: #059669; } .s5 .score-fill { background: #059669; width: 100%; }
+  .s4 .score-val { color: #0284c7; } .s4 .score-fill { background: #0284c7; width: 80%; }
+  .s3 .score-val { color: #d97706; } .s3 .score-fill { background: #d97706; width: 60%; }
+  .s2 .score-val { color: #dc2626; } .s2 .score-fill { background: #dc2626; width: 40%; }
+  .s1 .score-val { color: #991b1b; } .s1 .score-fill { background: #991b1b; width: 20%; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+  .pill { background: #e0f2fe; color: #0369a1; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .pill.amenity { background: #fef3c7; color: #92400e; }
+  .pill.red-flag { background: #fee2e2; color: #991b1b; }
+
+  .details-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 16px 0; }
+  .detail-item { padding: 10px 14px; background: #f8f9fa; border-radius: 8px; }
+  .detail-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #999; }
+  .detail-value { font-size: 14px; font-weight: 600; margin-top: 1px; }
+
+  .bed-cards { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 12px 0; }
+  .bed-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; display: flex; align-items: center; gap: 10px; }
+  .bed-icon { font-size: 24px; }
+  .bed-info .bed-name { font-weight: 700; font-size: 13px; }
+  .bed-info .bed-type { font-size: 11px; color: #666; }
+
+  .gallery-section { margin: 12px 0; }
+  .gallery-room-title { font-size: 12px; font-weight: 700; color: #1a3a5c; margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 1px; }
+  .gallery-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .gallery-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; cursor: pointer; }
+
+  .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; flex-direction: column; justify-content: center; align-items: center; }
+  .lightbox.active { display: flex; }
+  .lightbox-img-wrap { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; flex: 1; min-height: 0; }
+  .lightbox-img-wrap img { max-width: 92vw; max-height: 80vh; border-radius: 8px; object-fit: contain; user-select: none; }
+  .lb-close { position: absolute; top: 12px; right: 16px; color: #fff; font-size: 32px; cursor: pointer; z-index: 1010; background: rgba(0,0,0,0.5); border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .lb-nav { position: absolute; top: 50%; transform: translateY(-50%); color: #fff; font-size: 28px; cursor: pointer; z-index: 1010; background: rgba(0,0,0,0.4); border: none; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .lb-nav.prev { left: 8px; }
+  .lb-nav.next { right: 8px; }
+  .lb-counter { color: rgba(255,255,255,0.7); font-size: 13px; padding: 10px 0 16px; text-align: center; flex-shrink: 0; }
+
+  .footer { text-align: center; padding: 24px 16px; color: #999; font-size: 11px; margin-top: 32px; border-top: 1px solid #e5e7eb; }
+  h3 { font-size: 15px; }
+
+  @media (min-width: 768px) {
+    .hero { height: 480px; }
+    .hero-overlay { padding: 40px; }
+    .hero-title { font-size: 48px; }
+    .hero-sub { font-size: 18px; }
+    .stats-ribbon { grid-template-columns: repeat(6, 1fr); }
+    .stat-item { padding: 18px 16px; border-bottom: none; }
+    .stat-item:nth-child(3n+2) { border-left: none; border-right: none; }
+    .stat-item { border-right: 1px solid rgba(255,255,255,0.15); }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 28px; }
+    .scores-grid { grid-template-columns: repeat(4, 1fr); }
+    .details-grid { grid-template-columns: 1fr 1fr; }
+    .bed-cards { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .gallery-row { grid-template-columns: repeat(4, 1fr); }
+    .gallery-img { height: 150px; }
+    .report-card { padding: 32px; }
+    .narrative { font-size: 17px; padding: 24px; }
+    .section-title { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" onclick="closeLightbox()">&times;</button>
+  <div class="lightbox-img-wrap" id="lb-swipe">
+    <button class="lb-nav prev" onclick="navLightbox(-1)">&#8249;</button>
+    <img id="lightbox-img" src="" alt="">
+    <button class="lb-nav next" onclick="navLightbox(1)">&#8250;</button>
+  </div>
+  <div class="lb-counter" id="lb-counter"></div>
+</div>
+
+<div class="hero">
+  <div class="hero-overlay">
+    <div class="hero-title">Hatteras Star</div>
+    <div class="hero-sub">Hatteras Island &bull; Outer Banks, NC &bull; Midgett Realty</div>
+  </div>
+</div>
+
+<div class="stats-ribbon">
+  <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Bedrooms</div></div>
+  <div class="stat-item"><div class="stat-num">2</div><div class="stat-label">Bathrooms</div></div>
+  <div class="stat-item"><div class="stat-num">6</div><div class="stat-label">BR Observed</div></div>
+  <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">Eating Seats</div></div>
+  <div class="stat-item"><div class="stat-num">10+</div><div class="stat-label">Yrs Since Reno</div></div>
+  <div class="stat-item"><div class="stat-num">OBX</div><div class="stat-label">Market</div></div>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-title">AI Property Evaluation</div>
+    <div class="report-card">
+      <div class="narrative">
+        &ldquo;This Hatteras Island rental offers a <strong>classic Outer Banks beach house experience</strong> with rustic-coastal decor. It provides ample sleeping arrangements across six bedrooms and features an open-concept living area with vaulted ceilings and multiple outdoor decks. While not newly renovated, its functional layout and traditional charm make it a <strong>solid choice for families seeking a comfortable and unpretentious beach getaway</strong>.&rdquo;
+      </div>
+
+      <div class="scores-grid">
+        <div class="score-tile s4"><div class="score-val">4</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Condition</div></div>
+        <div class="score-tile s4"><div class="score-val">4</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Outdoor</div></div>
+        <div class="score-tile s4"><div class="score-val">4</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Curb Appeal</div></div>
+        <div class="score-tile s4"><div class="score-val">4</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Photos</div></div>
+        <div class="score-tile s3"><div class="score-val">3</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Furniture</div></div>
+        <div class="score-tile s3"><div class="score-val">3</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Kitchen</div></div>
+        <div class="score-tile s3"><div class="score-val">3</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">Bathrooms</div></div>
+        <div class="score-tile s2"><div class="score-val">2</div><div class="score-bar"><div class="score-fill"></div></div><div class="score-name">View</div></div>
+      </div>
+
+      <h3 style="margin-top:20px; color:#1a3a5c;">Standout Features</h3>
+      <div class="pills">
+        <div class="pill">Vaulted ceilings with exposed beams</div>
+        <div class="pill">Spiral staircase to loft</div>
+        <div class="pill">Multiple spacious decks</div>
+        <div class="pill">Classic wood-paneled accents</div>
+      </div>
+
+      <h3 style="margin-top:18px; color:#1a3a5c;">Red Flags</h3>
+      <div class="pills">
+        <div class="pill red-flag">Dated kitchen &amp; bathrooms</div>
+        <div class="pill red-flag">Weathered decks</div>
+        <div class="pill red-flag">No pool or hot tub</div>
+      </div>
+
+      <div class="details-grid" style="margin-top:20px;">
+        <div class="detail-item"><div class="detail-label">Bedrooms Observed</div><div class="detail-value">6 (5 adult + 1 kid bunk)</div></div>
+        <div class="detail-item"><div class="detail-label">Living Areas</div><div class="detail-value">1</div></div>
+        <div class="detail-item"><div class="detail-label">Dining Seats</div><div class="detail-value">6 at table, 12 total</div></div>
+        <div class="detail-item"><div class="detail-label">Decor Style</div><div class="detail-value">Coastal / Nautical</div></div>
+        <div class="detail-item"><div class="detail-label">Renovation</div><div class="detail-value">10+ years ago</div></div>
+        <div class="detail-item"><div class="detail-label">Washer/Dryer</div><div class="detail-value">Stacked</div></div>
+        <div class="detail-item"><div class="detail-label">Parking</div><div class="detail-value">Unpaved + covered under house</div></div>
+        <div class="detail-item"><div class="detail-label">Ground Level</div><div class="detail-value">Open pilings, parking &amp; storage</div></div>
+      </div>
+
+      <h3 style="margin-top:18px; color:#1a3a5c;">Amenities Detected</h3>
+      <div class="pills">
+        <div class="pill amenity">Full Kitchen</div>
+        <div class="pill amenity">Washer/Dryer</div>
+        <div class="pill amenity">Multiple Decks</div>
+        <div class="pill amenity">Ceiling Fans</div>
+        <div class="pill amenity">Spiral Staircase</div>
+        <div class="pill amenity">TVs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bedroom Breakdown</div>
+    <div class="bed-cards">
+      <div class="bed-card"><div class="bed-icon">&#128081;</div><div class="bed-info"><div class="bed-name">Loft</div><div class="bed-type">Queen bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128719;&#65039;</div><div class="bed-info"><div class="bed-name">Bedroom 2</div><div class="bed-type">Queen + 2 bunk beds (4 twins)</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 3</div><div class="bed-type">Queen bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 4</div><div class="bed-type">Queen bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 5</div><div class="bed-type">Queen bed</div></div></div>
+      <div class="bed-card"><div class="bed-icon">&#128716;</div><div class="bed-info"><div class="bed-name">Bedroom 6</div><div class="bed-type">Queen bed</div></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Outdoor Living</div>
+    <div class="narrative" style="border-left-color:#059669;">
+      Multiple wooden decks on various levels, including a front entrance deck with chairs, a large side sun deck with additional seating, and a lower covered deck featuring a picnic table. No pool or hot tub visible.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Interior Quality</div>
+    <div class="narrative" style="border-left-color:#0284c7;">
+      Features a blend of natural wood paneling and painted drywall, contributing to a rustic-coastal atmosphere. Flooring consists of carpet in living areas and bedrooms, with tile in the kitchen and bathrooms. Kitchen countertops are laminate, and bathroom vanities are basic white. Overall, a functional and practical aesthetic with durable finishes.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Curb Appeal</div>
+    <div class="narrative" style="border-left-color:#d97706;">
+      Traditional cedar shake siding gives the home a classic, weathered Outer Banks beach house appearance. Elevated on stilts with a welcoming front deck and multiple exterior wooden stairs. Unpaved driveway surrounded by coastal greenery.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Photo Gallery</div>
+    <div class="gallery-section">
+      <div class="gallery-room-title">Exterior &amp; Decks</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/stl-default-images/2128/home/402187/1714395598_image.jpeg" onclick="openLightbox(this)" alt="Exterior">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852948.jpeg" onclick="openLightbox(this)" alt="Deck">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852949.jpeg" onclick="openLightbox(this)" alt="Deck">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852950.jpeg" onclick="openLightbox(this)" alt="Deck">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852951.jpeg" onclick="openLightbox(this)" alt="Deck">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852952.jpeg" onclick="openLightbox(this)" alt="Exterior">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Living &amp; Kitchen</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_157379643.jpeg" onclick="openLightbox(this)" alt="Living Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852941.jpeg" onclick="openLightbox(this)" alt="Living Room">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852942.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_164202030.jpeg" onclick="openLightbox(this)" alt="Kitchen">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_164202029.jpeg" onclick="openLightbox(this)" alt="Dining">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_164202032.jpeg" onclick="openLightbox(this)" alt="Living">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_164202033.jpeg" onclick="openLightbox(this)" alt="Living">
+      </div>
+    </div>
+
+    <div class="gallery-section">
+      <div class="gallery-room-title">Bedrooms &amp; Bathrooms</div>
+      <div class="gallery-row">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852954.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852955.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852960.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852959.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163857587.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852957.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852956.jpeg" onclick="openLightbox(this)" alt="Bathroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163857588.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852958.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163852953.jpeg" onclick="openLightbox(this)" alt="Loft">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163857589.jpeg" onclick="openLightbox(this)" alt="Bedroom">
+        <img class="gallery-img" src="https://gallery.streamlinevrs.com/units-gallery/00/06/8E/image_163857590.jpeg" onclick="openLightbox(this)" alt="Bunk Room">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Topsail Pricing &bull; One-Off Property Evaluation &bull; April 5, 2026<br>
+  Gemini 2.5 Flash AI Analysis &bull; <a href="https://www.midgettrealty.com/rental/hatteras-star" style="color:#0284c7;">View on Midgett Realty</a>
+</div>
+
+<script>
+  var allImages = [];
+  var currentIndex = 0;
+  var scrollPos = 0;
+  document.querySelectorAll('.gallery-img').forEach(function(img) {
+    allImages.push({ src: img.src, label: img.alt || '' });
+  });
+  function openLightbox(img) {
+    scrollPos = window.scrollY;
+    for (var i = 0; i < allImages.length; i++) { if (allImages[i].src === img.src) { currentIndex = i; break; } }
+    showImage();
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+    window.scrollTo(0, scrollPos);
+  }
+  function navLightbox(dir) {
+    currentIndex = (currentIndex + dir + allImages.length) % allImages.length;
+    showImage();
+  }
+  function showImage() {
+    document.getElementById('lightbox-img').src = allImages[currentIndex].src;
+    document.getElementById('lb-counter').textContent = (currentIndex + 1) + ' / ' + allImages.length;
+  }
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('lightbox').classList.contains('active')) return;
+    if (e.key === 'ArrowRight') navLightbox(1);
+    else if (e.key === 'ArrowLeft') navLightbox(-1);
+    else if (e.key === 'Escape') closeLightbox();
+  });
+  (function() {
+    var startX = 0, moved = false;
+    var wrap = document.getElementById('lb-swipe');
+    wrap.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; moved = false; }, { passive: true });
+    wrap.addEventListener('touchmove', function() { moved = true; }, { passive: true });
+    wrap.addEventListener('touchend', function(e) {
+      if (!moved) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - (startX ? e.changedTouches[0].clientY : 0);
+      if (Math.abs(dx) > 40) navLightbox(dx < 0 ? 1 : -1);
+    }, { passive: true });
+    wrap.addEventListener('click', function(e) { if (e.target === wrap) closeLightbox(); });
+  })();
+  window.addEventListener('beforeunload', function(e) { e.preventDefault(); e.returnValue = ''; });
+</script>
+</body>
+</html>
